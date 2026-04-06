@@ -1,0 +1,189 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2543349c-8992-4a14-83d8-bf1cadc8c13e",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Search the internet and provide a professional SWOT analysis for Pfizer. Focus on recent news and financial health.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "744c9ab9-d202-4bbb-8401-7d16662a7e6b",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        208
+      ],
+      "id": "4b7f91e2-5a95-4010-903c-8380aa6a0f69",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "GnsLl3zBzASTG5DB",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "query": "Research the latest SWOT analysis for Pfizer",
+        "options": {}
+      },
+      "type": "@tavily/n8n-nodes-tavily.tavilyTool",
+      "typeVersion": 1,
+      "position": [
+        256,
+        208
+      ],
+      "id": "e7f13a8c-0d31-4605-9956-49dfb75b6061",
+      "name": "Search in Tavily",
+      "credentials": {
+        "tavilyApi": {
+          "id": "0EwYFIUeUUb6PLbu",
+          "name": "Tavily account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "rarima123456@gmail.com",
+        "toEmail": "rarima123456@gmail.com",
+        "subject": "=🛡️ Action Required: Approve AI SWOT for Pfizer",
+        "html": "=Subject: 🛡️ Action Required: Approve SWOT for {{ $node[\"AI Agent\"].json[\"company\"] }}\n\nThe AI Agent has gathered the following research:\n{{ $node[\"AI Agent\"].json[\"output\"] }}\n\nHuman-in-the-Loop Approval:\nIf this data is correct, click the link below to continue the process:\n{{ $execution.resumeUrl }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        688,
+        0
+      ],
+      "id": "8041cac7-873b-4402-8a85-10dccd990717",
+      "name": "Send an Email",
+      "webhookId": "eee4fadf-4dab-4bd7-acc9-fbdbefe8b046",
+      "credentials": {
+        "smtp": {
+          "id": "J5TsBHMfICfViGcU",
+          "name": "SMTP account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        576,
+        256
+      ],
+      "id": "d4e2f67e-858d-424f-bbda-47e02b4dc3b3",
+      "name": "Wait",
+      "webhookId": "99e56587-ddd7-4212-b041-613e8064bd3c",
+      "alwaysOutputData": true
+    }
+  ],
+  "pinData": {
+    "Wait": [
+      {
+        "json": {
+          "name": "First item",
+          "code": 1
+        }
+      },
+      {
+        "json": {
+          "name": "Second item",
+          "code": 2
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search in Tavily": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "48530d35-2393-482a-b5ae-4da156373b34",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8f84506a71cc73acc91c818195387033ebc9b3b3e5727187769472de3c06ac6d"
+  },
+  "id": "vtCO2RgnnwDZAlO2",
+  "tags": []
+}
